@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 // Routes through your backend proxy (/api/gemini) to avoid browser CORS blocks.
 // Falls back to a direct call in local development when proxy is not running.
 
-const API_BASE = "https://reviewai-backend.onrender.com"; // empty = same domain as frontend; works after VPS deployment
+const API_BASE = ""; // empty = same domain as frontend; works after VPS deployment
 
 async function callGemini(apiKey, prompt) {
   // 1. Try backend proxy (production — key stored server-side in .env)
@@ -324,7 +324,16 @@ function BarChart({ data }) {
 function Stars({ rating, size=14 }) {
   return (
     <span style={{ display:"inline-flex", gap:2 }}>
-      {[1,2,3,4,5].map(i => <span key={i}><Icon.star filled={i<=rating} /></span>)}
+      {[1,2,3,4,5].map(i => (
+        <span key={i}>
+          <svg width={size} height={size} viewBox="0 0 24 24"
+            fill={i <= rating ? "#F59E0B" : "none"}
+            stroke={i <= rating ? "#F59E0B" : "#3a3848"}
+            strokeWidth="1.5">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+        </span>
+      ))}
     </span>
   );
 }
@@ -642,7 +651,7 @@ Only return the JSON array, nothing else.`;
               {/* Rating row */}
               <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:20, padding:"10px 14px", background:tokens.surfaceEl, borderRadius:9, border:`1px solid ${tokens.border}` }}>
                 <Stars rating={rating} size={14} />
-                <span style={{ fontSize:13, color:tokens.textSub }}>Experience rating</span>
+                <span style={{ fontSize:13, color:tokens.textSub }}>{rating} star{rating!==1?"s":""} — Experience rating</span>
                 <button style={{ marginLeft:"auto", background:"none", border:"none", color:tokens.accent, fontSize:12, cursor:"pointer", fontWeight:600 }} onClick={()=>setStep("rate")}>Change</button>
               </div>
 
