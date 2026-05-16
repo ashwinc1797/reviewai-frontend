@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 // Routes through your backend proxy (/api/gemini) to avoid browser CORS blocks.
 // Falls back to a direct call in local development when proxy is not running.
 
-const API_BASE = "https://reviewai-backend.onrender.com"; // empty = same domain as frontend; works after VPS deployment
+const API_BASE = "https://reviewai-backend-mqsr.onrender.com"; // empty = same domain as frontend; works after VPS deployment
 
 async function callGemini(apiKey, prompt) {
   // 1. Try backend proxy (production — key stored server-side in .env)
