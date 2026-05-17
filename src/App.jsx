@@ -854,6 +854,36 @@ function Overview({ businesses, reviews, feedback, onPreviewPage }) {
   );
 }
 
+// Reliable copy button with fallback
+function ShareCopyButton({ url }) {
+  const [copied, setCopied] = useState(false);
+  function doCopy() {
+    const copy = (text) => {
+      if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(text)
+          .then(() => { setCopied(true); setTimeout(() => setCopied(false), 2500); })
+          .catch(() => fallback(text));
+      } else { fallback(text); }
+    };
+    const fallback = (text) => {
+      const el = document.createElement("textarea");
+      el.value = text;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    };
+    copy(url);
+  }
+  return (
+    <button onClick={doCopy} style={{ ...S.btn(copied?"success":"ghost"), padding:"5px 12px", fontSize:12, flexShrink:0 }}>
+      {copied ? <><Icon.check /> Copied!</> : <><Icon.copy /> Copy</>}
+    </button>
+  );
+}
+
 function QRManager({ businesses }) {
   const biz = businesses[0];
   const DEFAULT_URL = "https://reviewai-frontend-6fzg.onrender.com?review=1";
@@ -977,9 +1007,32 @@ function QRManager({ businesses }) {
   }, [activeUrl, activeSize]);
 
   function copyUrl() {
-    navigator.clipboard?.writeText(reviewUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    const urlToCopy = reviewUrl.trim() || DEFAULT_URL;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(urlToCopy)
+        .then(() => { setCopied(true); setTimeout(() => setCopied(false), 2500); })
+        .catch(() => {
+          // Fallback for browsers that block clipboard
+          const el = document.createElement("textarea");
+          el.value = urlToCopy;
+          document.body.appendChild(el);
+          el.select();
+          document.execCommand("copy");
+          document.body.removeChild(el);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2500);
+        });
+    } else {
+      // Fallback
+      const el = document.createElement("textarea");
+      el.value = urlToCopy;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    }
   }
 
   const displaySize = Math.min(activeSize, 280);
@@ -1133,6 +1186,32 @@ function QRManager({ businesses }) {
               <p style={{ fontSize:22, fontWeight:700, color:tokens.text, margin:0, letterSpacing:"-0.5px" }}>{s.value}</p>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Share Review Link */}
+      <div style={{ ...S.card, marginTop:20 }}>
+        <h2 style={{ ...S.h2, fontSize:14, marginBottom:6 }}>Share Review Link</h2>
+        <p style={{ ...S.muted, fontSize:12, marginBottom:16 }}>
+          Send this link to students via WhatsApp, SMS, or email — they don't need to scan a QR.
+        </p>
+        <div style={{ background:tokens.surfaceEl, border:`1px solid ${tokens.border}`, borderRadius:9, padding:"11px 14px", marginBottom:14, display:"flex", alignItems:"center", gap:10 }}>
+          <span style={{ fontSize:12, color:tokens.textSub, flex:1, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
+            https://reviewai-frontend-6fzg.onrender.com?review=1
+          </span>
+          <ShareCopyButton url="https://reviewai-frontend-6fzg.onrender.com?review=1" />
+        </div>
+        <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
+          <a href={`https://wa.me/?text=${encodeURIComponent(`Hi! Thank you for choosing ${biz.name} 😊\nWe'd love your feedback — takes just 30 seconds:\nhttps://reviewai-frontend-6fzg.onrender.com?review=1`)}`}
+            target="_blank" rel="noopener noreferrer"
+            style={{ ...S.btn("success"), textDecoration:"none" }}>
+            <Icon.whatsapp /> Share on WhatsApp
+          </a>
+          <button style={S.btn()} onClick={()=>{
+            navigator.clipboard?.writeText(`Hi! Thank you for choosing ${biz.name}!\nShare your experience here: https://reviewai-frontend-6fzg.onrender.com?review=1`);
+          }}>
+            <Icon.copy /> Copy WhatsApp message
+          </button>
         </div>
       </div>
     </div>
