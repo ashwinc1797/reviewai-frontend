@@ -209,7 +209,7 @@ Only return the JSON array, nothing else.`;
               {/* Dynamic hint */}
               {rating>0 && !isHappy && (
                 <div style={{ background:"#ef444411", border:"1px solid #ef444430", borderRadius:10, padding:"10px 14px", marginBottom:16, fontSize:12, color:"#f87171", lineHeight:1.5 }}>
-                  💬 Your feedback will go directly to the owner — not posted on Google.
+                  💬 Your feedback will go directly to the owner — kept confidential.
                 </div>
               )}
               <button
@@ -330,7 +330,7 @@ Only return the JSON array, nothing else.`;
                 <span style={{ fontSize:18, flexShrink:0 }}>🔒</span>
                 <div>
                   <p style={{ margin:0, fontWeight:600, fontSize:13, color:"#f87171" }}>We value your feedback</p>
-                  <p style={{ margin:"3px 0 0", fontSize:12, color:"#8b88a0", lineHeight:1.5 }}>This goes directly to the owner — not posted on Google. Thank you for helping us improve.</p>
+                  <p style={{ margin:"3px 0 0", fontSize:12, color:"#8b88a0", lineHeight:1.5 }}>This goes directly to the owner — kept confidential. Thank you for helping us improve.</p>
                 </div>
               </div>
 
