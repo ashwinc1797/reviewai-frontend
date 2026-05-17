@@ -595,9 +595,17 @@ Return ONLY the JSON array, no other text.`;
               </div>
 
               {/* Review text */}
-              <div style={{ background:tokens.surfaceEl, border:`1px solid ${tokens.border}`, borderRadius:11, padding:"14px 16px", marginBottom:16 }}>
+              <div style={{ background:tokens.surfaceEl, border:`1px solid ${tokens.border}`, borderRadius:11, padding:"14px 16px", marginBottom:10 }}>
                 <p style={{ color:tokens.textMuted, fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.8px", margin:"0 0 8px" }}>Your review</p>
                 <p style={{ fontSize:13, color:tokens.text, lineHeight:1.7, margin:0 }}>{chosen}</p>
+              </div>
+
+              {/* Personalisation tip */}
+              <div style={{ background:"rgba(245,158,11,0.08)", border:"1px solid rgba(245,158,11,0.2)", borderRadius:9, padding:"10px 14px", marginBottom:14, display:"flex", alignItems:"flex-start", gap:10 }}>
+                <span style={{ fontSize:16, flexShrink:0 }}>✏️</span>
+                <p style={{ margin:0, fontSize:12, color:tokens.amber, lineHeight:1.6 }}>
+                  <strong>Tip:</strong> Feel free to edit this in your own words on Google — personalised reviews rank higher and carry more weight!
+                </p>
               </div>
 
               {!copied && (
