@@ -77,7 +77,10 @@ const ISSUE_OPTIONS = ["Trainer quality", "Curriculum depth", "Batch timing", "P
 const Icon = {
   logo: () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-      <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor"/>
+      {/* SpeedUp arrow — upward pointing arrow in a circle, matching brand */}
+      <circle cx="12" cy="12" r="10" fill="#CC0000"/>
+      <polyline points="8,14 12,8 16,14" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+      <line x1="12" y1="8" x2="12" y2="17" stroke="#fff" strokeWidth="2.2" strokeLinecap="round"/>
     </svg>
   ),
   overview: () => (
@@ -251,25 +254,26 @@ const Icon = {
   ),
 };
 
-// ── Design System ─────────────────────────────────────────────────────────
+// ── SpeedUp Infotech Brand Design System ──────────────────────────────────
+// Brand: Black (#000), White (#FFF), Red (#CC0000)
 const tokens = {
-  bg:        "#080B14",
-  surface:   "#0E1220",
-  surfaceEl: "#141928",
-  border:    "#1E2740",
-  borderHov: "#2D3D5E",
-  accent:    "#3B7EF6",
-  accentLow: "rgba(59,126,246,0.12)",
-  accentMid: "rgba(59,126,246,0.22)",
-  text:      "#E2E8F5",
-  textSub:   "#7A8BAD",
-  textMuted: "#3D4F72",
+  bg:        "#000000",
+  surface:   "#111111",
+  surfaceEl: "#1A1A1A",
+  border:    "#2A2A2A",
+  borderHov: "#CC0000",
+  accent:    "#CC0000",
+  accentLow: "rgba(204,0,0,0.12)",
+  accentMid: "rgba(204,0,0,0.25)",
+  text:      "#FFFFFF",
+  textSub:   "#AAAAAA",
+  textMuted: "#555555",
   green:     "#22C55E",
   greenLow:  "rgba(34,197,94,0.1)",
   amber:     "#F59E0B",
   amberLow:  "rgba(245,158,11,0.1)",
-  red:       "#EF4444",
-  redLow:    "rgba(239,68,68,0.1)",
+  red:       "#CC0000",
+  redLow:    "rgba(204,0,0,0.12)",
 };
 
 const S = {
@@ -277,27 +281,27 @@ const S = {
   sidebar:  { width:224, background:tokens.surface, borderRight:`1px solid ${tokens.border}`, display:"flex", flexDirection:"column", padding:"0", position:"fixed", top:0, left:0, bottom:0, zIndex:100 },
   main:     { marginLeft:224, padding:"36px 40px", minHeight:"100vh" },
   logo:     { padding:"22px 20px 20px", fontSize:15, fontWeight:700, letterSpacing:"-0.2px", color:tokens.text, display:"flex", alignItems:"center", gap:10, borderBottom:`1px solid ${tokens.border}` },
-  logoMark: { width:34, height:34, background:"linear-gradient(135deg,#3B7EF6,#60A5FA)", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", flexShrink:0 },
+  logoMark: { width:34, height:34, background:"transparent", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", flexShrink:0 },
   navSection:{ padding:"8px 12px 4px", fontSize:10, fontWeight:700, color:tokens.textMuted, textTransform:"uppercase", letterSpacing:"1.2px", marginTop:8 },
-  navItem:  (a) => ({ display:"flex", alignItems:"center", gap:10, padding:"9px 14px", margin:"1px 8px", borderRadius:8, cursor:"pointer", fontSize:13, fontWeight:a?600:400, color:a?tokens.text:tokens.textSub, background:a?tokens.accentLow:"transparent", transition:"all 0.12s", userSelect:"none" }),
+  navItem:  (a) => ({ display:"flex", alignItems:"center", gap:10, padding:"9px 14px", margin:"1px 8px", borderRadius:8, cursor:"pointer", fontSize:13, fontWeight:a?600:400, color:a?tokens.text:tokens.textSub, background:a?tokens.accentLow:"transparent", borderLeft:a?`3px solid #CC0000`:"3px solid transparent", transition:"all 0.12s", userSelect:"none" }),
   card:     { background:tokens.surface, border:`1px solid ${tokens.border}`, borderRadius:14, padding:"22px 24px" },
   statCard: { background:tokens.surface, border:`1px solid ${tokens.border}`, borderRadius:14, padding:"20px 22px", flex:1, minWidth:0 },
   btn: (v="primary") => ({
     display:"inline-flex", alignItems:"center", gap:7, padding:"8px 16px", borderRadius:8,
     fontSize:13, fontWeight:600, cursor:"pointer", border:"none", transition:"all 0.12s", textDecoration:"none",
-    ...(v==="primary" ? { background:tokens.accent, color:"#fff" } :
+    ...(v==="primary" ? { background:"#CC0000", color:"#fff" } :
         v==="ghost"   ? { background:"transparent", color:tokens.textSub, border:`1px solid ${tokens.border}` } :
         v==="success" ? { background:tokens.greenLow, color:tokens.green, border:`1px solid rgba(34,197,94,0.25)` } :
-        v==="danger"  ? { background:tokens.redLow, color:tokens.red, border:`1px solid rgba(239,68,68,0.25)` } :
-        v==="red"     ? { background:tokens.red, color:"#fff" } :
-                        { background:tokens.accentLow, color:"#93C5FD", border:`1px solid ${tokens.accentMid}` })
+        v==="danger"  ? { background:tokens.redLow, color:"#CC0000", border:`1px solid rgba(204,0,0,0.3)` } :
+        v==="red"     ? { background:"#CC0000", color:"#fff" } :
+                        { background:tokens.accentLow, color:"#FF4444", border:`1px solid ${tokens.accentMid}` })
   }),
   input:    { background:tokens.surfaceEl, border:`1px solid ${tokens.border}`, borderRadius:8, padding:"10px 14px", color:tokens.text, fontSize:13, width:"100%", outline:"none", boxSizing:"border-box", transition:"border-color 0.15s" },
   badge:    (c) => ({ display:"inline-flex", alignItems:"center", padding:"3px 10px", borderRadius:20, fontSize:11, fontWeight:600,
     ...(c==="green" ? {background:tokens.greenLow, color:tokens.green} :
         c==="amber" ? {background:tokens.amberLow, color:tokens.amber} :
-        c==="red"   ? {background:tokens.redLow, color:tokens.red} :
-                      {background:tokens.accentLow, color:"#93C5FD"}) }),
+        c==="red"   ? {background:tokens.redLow, color:"#FF4444"} :
+                      {background:tokens.accentLow, color:"#FF4444"}) }),
   h1:       { fontSize:22, fontWeight:700, color:tokens.text, margin:"0 0 4px", letterSpacing:"-0.4px" },
   h2:       { fontSize:16, fontWeight:600, color:tokens.text, margin:"0 0 18px", letterSpacing:"-0.2px" },
   muted:    { fontSize:13, color:tokens.textSub },
@@ -312,7 +316,7 @@ function BarChart({ data }) {
       {data.map(d => (
         <div key={d.day} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:5 }}>
           <div style={{ width:"100%", background:tokens.surfaceEl, borderRadius:5, overflow:"hidden", height:56, display:"flex", alignItems:"flex-end" }}>
-            <div style={{ width:"100%", height:`${(d.scans/max)*100}%`, background:`linear-gradient(to top,${tokens.accent},#60A5FA)`, borderRadius:5, transition:"height 0.5s ease" }} />
+            <div style={{ width:"100%", height:`${(d.scans/max)*100}%`, background:`linear-gradient(to top,#CC0000,#FF4444)`, borderRadius:5, transition:"height 0.5s ease" }} />
           </div>
           <span style={{ fontSize:9, color:tokens.textMuted, fontWeight:600, letterSpacing:"0.5px" }}>{d.day}</span>
         </div>
@@ -446,17 +450,21 @@ Only return the JSON array, nothing else.`;
   return (
     <div style={pageStyle}>
       {/* Subtle grid background */}
-      <div style={{ position:"fixed", inset:0, backgroundImage:`linear-gradient(${tokens.border} 1px, transparent 1px), linear-gradient(90deg, ${tokens.border} 1px, transparent 1px)`, backgroundSize:"40px 40px", opacity:0.3, pointerEvents:"none" }} />
+      <div style={{ position:"fixed", inset:0, backgroundImage:`linear-gradient(${tokens.border} 1px, transparent 1px), linear-gradient(90deg, ${tokens.border} 1px, transparent 1px)`, backgroundSize:"40px 40px", opacity:0.2, pointerEvents:"none" }} />
 
       <div style={{ maxWidth:440, width:"100%", position:"relative", zIndex:1 }}>
 
         {/* Brand header */}
         <div style={{ textAlign:"center", marginBottom:28 }}>
           <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:tokens.surface, border:`1px solid ${tokens.border}`, borderRadius:40, padding:"8px 16px 8px 10px", marginBottom:20 }}>
-            <div style={{ width:26, height:26, background:"linear-gradient(135deg,#3B7EF6,#60A5FA)", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff" }}>
-              <Icon.logo />
+            <div style={{ width:30, height:30, background:"transparent", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", flexShrink:0 }}>
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" fill="#CC0000"/>
+                <polyline points="8,14 12,8 16,14" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+                <line x1="12" y1="8" x2="12" y2="17" stroke="#fff" strokeWidth="2.2" strokeLinecap="round"/>
+              </svg>
             </div>
-            <span style={{ fontSize:13, fontWeight:600, color:tokens.text }}>ReviewAI</span>
+            <span style={{ fontSize:13, fontWeight:700, color:tokens.text, letterSpacing:"-0.3px" }}>SpeedUp<span style={{color:"#CC0000"}}>Growth</span></span>
           </div>
 
           <h1 style={{ fontSize:24, fontWeight:700, color:tokens.text, margin:"0 0 8px", letterSpacing:"-0.5px", lineHeight:1.2 }}>
@@ -577,7 +585,7 @@ Only return the JSON array, nothing else.`;
                 { n:4, text:"Tap 'Post' to publish your review" },
               ].map(s=>(
                 <div key={s.n} style={{ display:"flex", alignItems:"flex-start", gap:12, marginBottom:10 }}>
-                  <div style={{ width:22, height:22, borderRadius:6, background:tokens.accentLow, border:`1px solid ${tokens.accentMid}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, color:"#93C5FD", flexShrink:0, fontWeight:700 }}>{s.n}</div>
+                  <div style={{ width:22, height:22, borderRadius:6, background:"rgba(204,0,0,0.15)", border:`1px solid rgba(204,0,0,0.3)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, color:"#FF4444", flexShrink:0, fontWeight:700 }}>{s.n}</div>
                   <span style={{ fontSize:13, color:tokens.textSub, lineHeight:1.55, paddingTop:3 }}>{s.text}</span>
                 </div>
               ))}
@@ -1318,9 +1326,23 @@ function Settings({ apiKey, setApiKey, businesses, setBusinesses }) {
   async function testApi() {
     setTesting(true); setTestResult("");
     try {
-      const r = await callGemini(localKey,"Say 'API connected!' and nothing else.");
-      setTestResult("connected:" + r.trim());
-    } catch(e) { setTestResult("error:" + e.message); }
+      // Test backend proxy first (production path)
+      const proxyRes = await fetch(API_BASE + "/api/health");
+      if (proxyRes.ok) {
+        const data = await proxyRes.json();
+        if (data.status === "ok") {
+          // Now test actual Gemini call through proxy
+          const r = await callGemini(localKey, "Say 'API connected!' and nothing else.");
+          setTestResult("connected:" + r.trim());
+        } else {
+          setTestResult("error:Backend responded but Gemini key may be invalid");
+        }
+      } else {
+        setTestResult("error:Backend proxy not reachable — check Render deployment");
+      }
+    } catch(e) {
+      setTestResult("error:" + e.message);
+    }
     setTesting(false);
   }
 
@@ -1335,24 +1357,23 @@ function Settings({ apiKey, setApiKey, businesses, setBusinesses }) {
       </div>
 
       <div style={{ display:"flex", flexDirection:"column", gap:18, maxWidth:560 }}>
-        {/* API Key */}
+        {/* Backend Connection */}
         <div style={S.card}>
           <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:16 }}>
             <div style={{ color:tokens.accent }}><Icon.key /></div>
-            <h2 style={{ ...S.h2, margin:0, fontSize:15 }}>Gemini API Key</h2>
+            <h2 style={{ ...S.h2, margin:0, fontSize:15 }}>AI Backend Connection</h2>
           </div>
-          <p style={{ ...S.muted, marginBottom:14, fontSize:12 }}>
-            Get your free key at{" "}
-            <a href="https://aistudio.google.com/apikey" target="_blank" style={{ color:tokens.accent, textDecoration:"none" }}>aistudio.google.com/apikey</a>
-          </p>
-          <input type="password" style={{ ...S.input, marginBottom:10 }} value={localKey} onChange={e=>setLocalKey(e.target.value)} placeholder="AIza..." />
-          <button style={S.btn("primary")} onClick={testApi} disabled={testing||!localKey}>
+          <div style={{ background:tokens.surfaceEl, borderRadius:10, padding:"12px 16px", marginBottom:14, fontSize:12, color:tokens.textSub, lineHeight:1.65 }}>
+            <p style={{ margin:"0 0 4px", fontWeight:600, color:tokens.text }}>Your API key is stored securely on the server</p>
+            <p style={{ margin:0 }}>The Groq API key is configured in your Render backend environment — it never touches the browser. Click below to verify the connection is live.</p>
+          </div>
+          <button style={S.btn("primary")} onClick={testApi} disabled={testing}>
             {testing ? "Testing…" : "Test connection"}
           </button>
           {testResult && (
             <div style={{ marginTop:10, display:"flex", alignItems:"center", gap:8, fontSize:12, color:isConnected?tokens.green:tokens.red }}>
               {isConnected ? <Icon.check /> : <Icon.warning />}
-              {isConnected ? "Connected successfully" : testResult.replace("error:","Error: ")}
+              {isConnected ? "Backend connected — AI features are working!" : testResult.replace("error:","Error: ")}
             </div>
           )}
         </div>
@@ -1448,7 +1469,7 @@ export default function App() {
       <aside style={S.sidebar}>
         <div style={S.logo}>
           <div style={S.logoMark}><Icon.logo /></div>
-          ReviewAI — SpeedUp
+          SpeedUpGrowth
         </div>
 
         <nav style={{ padding:"12px 0", flex:1 }}>
@@ -1468,12 +1489,12 @@ export default function App() {
         {/* API status footer */}
         <div style={{ padding:"16px 16px 20px", borderTop:`1px solid ${tokens.border}` }}>
           <div style={{ background:tokens.surfaceEl, borderRadius:10, padding:"12px 14px" }}>
-            <p style={{ fontSize:10, color:tokens.textMuted, margin:"0 0 6px", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.8px" }}>Gemini API</p>
+            <p style={{ fontSize:10, color:tokens.textMuted, margin:"0 0 6px", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.8px" }}>AI Backend</p>
             <div style={{ display:"flex", alignItems:"center", gap:7 }}>
-              <div style={{ width:7, height:7, borderRadius:"50%", background:apiKey?tokens.green:tokens.red, boxShadow:apiKey?`0 0 6px ${tokens.green}`:"none" }} />
-              <span style={{ fontSize:12, color:apiKey?tokens.green:tokens.red, fontWeight:600 }}>{apiKey?"Connected":"Not configured"}</span>
+              <div style={{ width:7, height:7, borderRadius:"50%", background:tokens.green, boxShadow:`0 0 6px ${tokens.green}` }} />
+              <span style={{ fontSize:12, color:tokens.green, fontWeight:600 }}>Connected</span>
             </div>
-            {!apiKey && <p style={{ fontSize:11, color:tokens.textMuted, marginTop:7, lineHeight:1.5, marginBottom:0 }}>Add your key in Settings to enable AI features.</p>}
+            <p style={{ fontSize:11, color:tokens.textMuted, marginTop:7, lineHeight:1.5, marginBottom:0 }}>Groq AI · Render backend</p>
           </div>
         </div>
       </aside>
