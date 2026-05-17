@@ -821,7 +821,7 @@ function Overview({ businesses, reviews, feedback, onPreviewPage }) {
 
 function QRManager({ businesses }) {
   const biz = businesses[0];
-  const DEFAULT_URL = "https://search.google.com/local/writereview?placeid=ChIJUcP4Q3YvwjcR5RmZj4cCrEA";
+  const DEFAULT_URL = "https://reviewai-frontend-6fzg.onrender.com?review=1";
 
   const [size,      setSize]      = useState(200);
   const [bgColor,   setBgColor]   = useState("#ffffff");
@@ -1447,9 +1447,23 @@ export default function App() {
     document.head.appendChild(link);
   },[]);
 
+  // Auto-show customer review page if URL has ?review=1 or ?r=1
+  // This is what the QR code should point to:
+  // https://reviewai-frontend-6fzg.onrender.com?review=1
+  useEffect(()=>{
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("review") === "1" || params.get("r") === "1") {
+      setShowCustomerPage(true);
+    }
+  },[]);
+
   if (showCustomerPage) {
     return <CustomerReviewPage biz={businesses[0]} apiKey={apiKey}
-      onBack={()=>setShowCustomerPage(false)}
+      onBack={()=>{
+        setShowCustomerPage(false);
+        // Remove ?review param from URL when going back
+        window.history.replaceState({}, "", window.location.pathname);
+      }}
       onFeedbackSubmit={entry=>setFeedback(prev=>[entry,...prev])} />;
   }
 
