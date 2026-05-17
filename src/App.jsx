@@ -407,23 +407,31 @@ function CustomerReviewPage({ biz, apiKey, onBack, onFeedbackSubmit, isPreview =
         const tones = ["enthusiastic", "genuine", "thoughtful", "casual", "professional", "grateful"];
         const lengths = ["2 sentences", "3 sentences", "2-3 sentences"];
 
-        // Pick 3 random aspects, a random tone and length — different every call
         const shuffle = arr => arr.sort(() => Math.random() - 0.5);
         const pickedAspects = shuffle([...aspects]).slice(0, 6).join(", ");
         const tone = tones[Math.floor(Math.random() * tones.length)];
         const length = lengths[Math.floor(Math.random() * lengths.length)];
-        const seed = Math.random().toString(36).slice(2, 8); // random string
+        const seed = Math.random().toString(36).slice(2, 8);
 
-        const prompt = `You are a review writing assistant for an IT training institute called "${biz.name}" in ${biz.city}.
+        const prompt = `You are an SEO and review writing expert for an IT training institute called "${biz.name}" in ${biz.city}.
 A student wants to leave a ${rating}-star Google review. Session ID: ${seed}
 
-Generate exactly 3 DIFFERENT, unique review suggestions. Each must:
+Generate exactly 3 DIFFERENT, unique, SEO-optimised review suggestions. Each review must:
+
+SEO RULES (important):
+- Naturally include the business name "${biz.name}" at least once
+- Naturally include location "${biz.city}" or "Pune" in at least 1 of the 3 reviews
+- Include relevant keywords like: IT training, software course, web development, MERN stack, full stack developer, placement, job-ready, best institute
+- Use long-tail keywords naturally e.g. "best IT training institute in Pune", "software development course with placement"
+- Keywords must sound natural — never keyword-stuffed
+
+REVIEW RULES:
 - Be ${length} long
-- Have a ${tone} tone  
-- Naturally mention DIFFERENT aspects from this list: ${pickedAspects}
-- Sound like it was written by a real student (not AI)
-- Be varied — no two reviews should start the same way or mention the same things
-- Avoid generic phrases like "highly recommend" in all 3
+- Have a ${tone} tone
+- Naturally mention DIFFERENT aspects from: ${pickedAspects}
+- Sound like a real student wrote it (not AI)
+- Each review must start differently and cover different points
+- Avoid repeating the same phrases across the 3 reviews
 
 Format as JSON array ONLY: ["review1","review2","review3"]
 Return ONLY the JSON array, no other text.`;
