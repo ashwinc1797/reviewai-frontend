@@ -76,7 +76,263 @@ const S = {
 function BarChart({ data }) {
   const max = Math.max(...data.map(d => d.scans));
   return (
+    <div style={{ display:"flex", alignItems:"flex-end", gap:6, height:80 }}>
+      {data.map(d => (
+        <div key={d.day} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:4 }}>
+          <div style={{ width:"100%", background:"#7c5cfc44", borderRadius:4, overflow:"hidden", height:64, display:"flex", alignItems:"flex-end" }}>
+            <div style={{ width:"100%", height:`${(d.scans/max)*100}%`, background:"linear-gradient(to top,#7c5cfc,#c084fc)", borderRadius:4, transition:"height 0.6s ease" }} />
+          </div>
+          <span style={{ fontSize:10, color:"#6b6880" }}>{d.day}</span>
+        </div>
+      ))}
     </div>
+  );
+}
+
+function Stars({ rating, size=14 }) {
+  return <span style={{ fontSize:size, letterSpacing:1 }}>{[1,2,3,4,5].map(i=><span key={i} style={{ color:i<=rating?"#fbbf24":"#3a3848" }}>★</span>)}</span>;
+}
+
+function RatingPicker({ value, onChange }) {
+  const [hover, setHover] = useState(0);
+  return (
+    <div style={{ display:"flex", gap:6 }}>
+      {[1,2,3,4,5].map(i=>(
+        <span key={i} onClick={()=>onChange(i)} onMouseEnter={()=>setHover(i)} onMouseLeave={()=>setHover(0)}
+          style={{ fontSize:34, cursor:"pointer", color:i<=(hover||value)?"#fbbf24":"#2a2835", transition:"color 0.1s", lineHeight:1 }}>★</span>
+      ))}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// CUSTOMER PAGE  —  with review gating
+// ══════════════════════════════════════════════════════════════════════════
+function CustomerReviewPage({ biz, apiKey, onBack, onFeedbackSubmit }) {
+  const [step,       setStep]       = useState("rate");
+  const [rating,     setRating]     = useState(0);
+  const [suggestions,setSuggestions]= useState([]);
+  const [chosen,     setChosen]     = useState("");
+  const [loading,    setLoading]    = useState(false);
+  const [copied,     setCopied]     = useState(false);
+  const [confirmed,  setConfirmed]  = useState(null);
+  const [issue,      setIssue]      = useState("");
+  const [details,    setDetails]    = useState("");
+  const [contact,    setContact]    = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const ratingLabels = ["","Very poor","Below average","Average","Good","Excellent"];
+  const isHappy = rating >= 4;
+
+  async function handleContinue() {
+    if (!rating) return;
+    if (isHappy) {
+      setLoading(true);
+      try {
+        const prompt = `You are a review writing assistant for a ${biz.type} called "${biz.name}" in ${biz.city}.
+The customer wants to leave a ${rating}-star Google review.
+Generate exactly 3 short, natural, authentic-sounding review suggestions (2-3 sentences each).
+Format as JSON array: ["review1","review2","review3"]
+Only return the JSON array, nothing else.`;
+        const text = await callGemini(apiKey, prompt);
+        const clean = text.replace(/```json|```/g,"").trim();
+        setSuggestions(JSON.parse(clean));
+      } catch { setSuggestions([]); }
+      setLoading(false);
+      setStep("suggest");
+    } else {
+      setStep("feedback");
+    }
+  }
+
+  async function handleSelectReview(text) {
+    setChosen(text);
+    try { await navigator.clipboard.writeText(text); setCopied(true); }
+    catch { setCopied(false); }
+    setStep("redirect");
+  }
+
+  function openGoogle() { window.open(biz.gmb,"_blank"); setStep("confirm"); }
+
+  function submitFeedback() {
+    if (!issue) return;
+    setSubmitting(true);
+    const entry = { id:`f${Date.now()}`, rating, issue, details, contact, date: new Date().toISOString().slice(0,10), resolved:false };
+    onFeedbackSubmit?.(entry);
+    setTimeout(() => { setSubmitting(false); setStep("feedbackDone"); }, 600);
+  }
+
+  const happySteps   = ["rate","suggest","redirect","confirm","done"];
+  const unhappySteps = ["rate","feedback","feedbackDone"];
+  const allSteps = (step==="feedback"||step==="feedbackDone") ? unhappySteps : happySteps;
+  const stepIdx  = allSteps.indexOf(step);
+  const dotColor = (!isHappy && step!=="rate") ? "#ef4444" : "#7c5cfc";
+
+  return (
+    <div style={{ minHeight:"100vh", background:"#0f0f13", display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
+      <div style={{ maxWidth:460, width:"100%" }}>
+
+        {/* Header */}
+        <div style={{ textAlign:"center", marginBottom:24 }}>
+          <div style={{ width:64, height:64, background: (!isHappy && step!=="rate") ? "linear-gradient(135deg,#dc2626,#f97316)" : "linear-gradient(135deg,#7c5cfc,#c084fc)", borderRadius:16, display:"flex", alignItems:"center", justifyContent:"center", fontSize:28, margin:"0 auto 14px", transition:"background 0.4s" }}>
+            {(step==="feedback"||step==="feedbackDone") ? "💬" : "⭐"}
+          </div>
+          <h1 style={{ ...S.h1, fontSize:22 }}>
+            {step==="feedback"     ? "We're sorry to hear that" :
+             step==="feedbackDone" ? "Thank you for telling us" :
+             "How was your experience?"}
+          </h1>
+          <p style={{ color:"#8b88a0", fontSize:14, marginTop:6 }}>{biz.name} · {biz.city}</p>
+        </div>
+
+        {/* Progress dots */}
+        <div style={{ display:"flex", justifyContent:"center", gap:6, marginBottom:24 }}>
+          {allSteps.map((s,i)=>(
+            <div key={s} style={{ width:i<=stepIdx?20:6, height:6, borderRadius:3, background:i<=stepIdx?dotColor:"#2a2835", transition:"all 0.3s" }} />
+          ))}
+        </div>
+
+        <div style={{ ...S.card, borderRadius:20 }}>
+
+          {/* ── Rate ────────────────────────────────────────────────── */}
+          {step==="rate" && (
+            <div>
+              <p style={{ color:"#8b88a0", fontSize:14, marginBottom:20, textAlign:"center" }}>Tap a star to rate your visit</p>
+              <div style={{ display:"flex", justifyContent:"center", marginBottom:14 }}>
+                <RatingPicker value={rating} onChange={setRating} />
+              </div>
+              {rating>0 && (
+                <p style={{ textAlign:"center", fontSize:13, marginBottom:20, fontWeight:600, color:isHappy?"#c4b5fd":"#f97316" }}>
+                  {ratingLabels[rating]}
+                </p>
+              )}
+              {/* Dynamic hint */}
+              {rating>0 && !isHappy && (
+                <div style={{ background:"#ef444411", border:"1px solid #ef444430", borderRadius:10, padding:"10px 14px", marginBottom:16, fontSize:12, color:"#f87171", lineHeight:1.5 }}>
+                  💬 Your feedback will go directly to the owner — not posted on Google.
+                </div>
+              )}
+              <button
+                style={{ ...S.btn("primary"), width:"100%", justifyContent:"center", opacity:rating?1:0.4, padding:"12px", fontSize:15, background: rating&&!isHappy?"#ef4444":"#7c5cfc" }}
+                onClick={handleContinue} disabled={!rating||loading}>
+                {loading ? "✨ Getting suggestions…" : isHappy||!rating ? "Continue →" : "Share private feedback →"}
+              </button>
+            </div>
+          )}
+
+          {/* ── Suggest (happy) ──────────────────────────────────────── */}
+          {step==="suggest" && (
+            <div>
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
+                <div>
+                  <p style={{ color:"#fff", fontWeight:600, fontSize:15, margin:0 }}>Pick a review</p>
+                  <p style={{ color:"#8b88a0", fontSize:12, margin:"4px 0 0" }}>AI-generated — tap one to select it</p>
+                </div>
+                <Stars rating={rating} size={16} />
+              </div>
+              <div style={{ display:"flex", flexDirection:"column", gap:10, marginBottom:12 }}>
+                {suggestions.length>0 ? suggestions.map((s,i)=>(
+                  <div key={i} onClick={()=>handleSelectReview(s)}
+                    style={{ background:"#12111a", border:"1px solid #2a2835", borderRadius:10, padding:"12px 14px", cursor:"pointer", fontSize:13, color:"#d4d0e8", lineHeight:1.6, transition:"all 0.15s" }}
+                    onMouseEnter={e=>{ e.currentTarget.style.borderColor="#7c5cfc"; e.currentTarget.style.background="#1a1828"; }}
+                    onMouseLeave={e=>{ e.currentTarget.style.borderColor="#2a2835"; e.currentTarget.style.background="#12111a"; }}>
+                    <span style={{ color:"#6b6880", fontSize:11, display:"block", marginBottom:4 }}>Option {i+1}</span>
+                    {s}
+                  </div>
+                )) : (
+                  <div>
+                    <textarea placeholder="Write your own review…" rows={4} style={{ ...S.input, resize:"vertical" }} onChange={e=>setChosen(e.target.value)} />
+                    <button style={{ ...S.btn("primary"), width:"100%", justifyContent:"center", marginTop:10 }} onClick={()=>handleSelectReview(chosen)}>Use this review →</button>
+                  </div>
+                )}
+              </div>
+              <button style={{ ...S.btn("ghost"), fontSize:11 }} onClick={()=>setStep("rate")}>← Change rating</button>
+            </div>
+          )}
+
+          {/* ── Redirect + instructions (happy) ─────────────────────── */}
+          {step==="redirect" && (
+            <div>
+              <div style={{ background:copied?"#16a34a22":"#d9770622", border:`1px solid ${copied?"#4ade8040":"#fbbf2440"}`, borderRadius:10, padding:"10px 14px", marginBottom:20, display:"flex", alignItems:"center", gap:10 }}>
+                <span style={{ fontSize:18 }}>{copied?"📋":"⚠️"}</span>
+                <div>
+                  <p style={{ margin:0, fontWeight:600, fontSize:13, color:copied?"#4ade80":"#fbbf24" }}>{copied?"Review text copied to clipboard!":"Please copy your review text manually"}</p>
+                  <p style={{ margin:"2px 0 0", fontSize:11, color:"#8b88a0" }}>{copied?"It's ready to paste on Google":"Clipboard access was blocked"}</p>
+                </div>
+              </div>
+              <div style={{ background:"#12111a", border:"1px solid #2a2835", borderRadius:10, padding:"12px 14px", marginBottom:20, fontSize:13, color:"#c8c5d8", lineHeight:1.65 }}>
+                <span style={{ color:"#6b6880", fontSize:11, display:"block", marginBottom:6 }}>Your review</span>
+                {chosen}
+              </div>
+              {!copied && (
+                <button style={{ ...S.btn(), width:"100%", justifyContent:"center", marginBottom:14 }}
+                  onClick={()=>navigator.clipboard.writeText(chosen).then(()=>setCopied(true))}>
+                  📋 Copy review text
+                </button>
+              )}
+              <div style={{ marginBottom:20 }}>
+                <p style={{ color:"#8b88a0", fontSize:11, marginBottom:12, fontWeight:600, textTransform:"uppercase", letterSpacing:1 }}>How to post on Google</p>
+                {[
+                  { n:1, text:"Tap the button below to open Google Reviews", icon:"👆" },
+                  { n:2, text:"Tap the star rating on Google",                icon:"⭐" },
+                  { n:3, text:"Tap the text box and paste your review",       icon:"📝" },
+                  { n:4, text:"Tap 'Post' to submit your review",             icon:"✅" },
+                ].map(s=>(
+                  <div key={s.n} style={{ display:"flex", alignItems:"flex-start", gap:12, marginBottom:10 }}>
+                    <div style={{ width:26, height:26, borderRadius:"50%", background:"#2a2640", border:"1px solid #7c5cfc44", display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, color:"#c4b5fd", flexShrink:0, fontWeight:700 }}>{s.n}</div>
+                    <div style={{ display:"flex", alignItems:"center", gap:8, paddingTop:3 }}>
+                      <span style={{ fontSize:14 }}>{s.icon}</span>
+                      <span style={{ fontSize:13, color:"#c8c5d8" }}>{s.text}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button style={{ ...S.btn("primary"), width:"100%", justifyContent:"center", padding:"13px", fontSize:15 }} onClick={openGoogle}>
+                Open Google Reviews →
+              </button>
+            </div>
+          )}
+
+          {/* ── Confirm (happy) ──────────────────────────────────────── */}
+          {step==="confirm" && (
+            <div style={{ textAlign:"center" }}>
+              <div style={{ fontSize:44, marginBottom:16 }}>📝</div>
+              <h2 style={{ ...S.h2, margin:"0 0 8px", fontSize:18 }}>Did you submit the review?</h2>
+              <p style={{ color:"#8b88a0", fontSize:14, marginBottom:24 }}>Google Reviews opened in a new tab. Let us know if you posted it!</p>
+              <div style={{ display:"flex", gap:12, justifyContent:"center" }}>
+                <button style={{ ...S.btn("success"), padding:"12px 28px", fontSize:14 }} onClick={()=>{ setConfirmed(true); setStep("done"); }}>✓ Yes, I submitted it!</button>
+                <button style={{ ...S.btn("ghost"),   padding:"12px 20px", fontSize:14 }} onClick={()=>{ setConfirmed(false); setStep("done"); }}>Not yet</button>
+              </div>
+            </div>
+          )}
+
+          {/* ── Done (happy) ─────────────────────────────────────────── */}
+          {step==="done" && (
+            <div style={{ textAlign:"center", padding:"10px 0" }}>
+              <div style={{ fontSize:52, marginBottom:16 }}>{confirmed?"🎉":"💛"}</div>
+              <h2 style={{ ...S.h2, margin:"0 0 10px" }}>{confirmed?"Thank you so much!":"No worries!"}</h2>
+              <p style={{ color:"#8b88a0", fontSize:14, lineHeight:1.6 }}>
+                {confirmed ? `Your review means the world to ${biz.name}. We'll keep working hard for you!`
+                           : "You can always post later. Just open Google Maps and search for us!"}
+              </p>
+              {!confirmed && <button style={{ ...S.btn("primary"), marginTop:20, justifyContent:"center" }} onClick={openGoogle}>Try again →</button>}
+              <div style={{ marginTop:20, padding:"12px 16px", background:"#12111a", borderRadius:10, fontSize:12, color:"#6b6880" }}>
+                {confirmed ? "Reviews may take a few minutes to appear on Google" : "We appreciate you taking the time!"}
+              </div>
+            </div>
+          )}
+
+          {/* ── Private feedback form (unhappy) ─────────────────────── */}
+          {step==="feedback" && (
+            <div>
+              {/* Private badge */}
+              <div style={{ background:"#ef444411", border:"1px solid #ef444430", borderRadius:10, padding:"12px 16px", marginBottom:20, display:"flex", gap:10, alignItems:"flex-start" }}>
+                <span style={{ fontSize:18, flexShrink:0 }}>🔒</span>
+                <div>
+                  <p style={{ margin:0, fontWeight:600, fontSize:13, color:"#f87171" }}>We value your feedback</p>
+                  <p style={{ margin:"3px 0 0", fontSize:12, color:"#8b88a0", lineHeight:1.5 }}>This goes directly to the owner — not posted on Google. Thank you for helping us improve.</p>
+                </div>
+              </div>
 
               {/* Rating row */}
               <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:20, padding:"10px 14px", background:"#12111a", borderRadius:8 }}>
@@ -112,7 +368,7 @@ function BarChart({ data }) {
 
               <button style={{ ...S.btn("primary"), width:"100%", justifyContent:"center", padding:"12px", fontSize:15, background:"#ef4444", opacity:issue?1:0.4 }}
                 onClick={submitFeedback} disabled={!issue||submitting}>
-                {submitting ? "Sending…" : "Send private feedback →"}
+                {submitting ? "Sending…" : "Send feedback →"}
               </button>
             </div>
           )}
@@ -137,7 +393,7 @@ function BarChart({ data }) {
                   💬 Chat on WhatsApp
                 </a>
               )}
-              <p style={{ fontSize:11, color:"#6b6880", marginTop:8 }}>Your feedback was not posted on Google</p>
+              <p style={{ fontSize:11, color:"#6b6880", marginTop:8 }}></p>
             </div>
           )}
 
@@ -404,7 +660,7 @@ function FeedbackInbox({ feedback, setFeedback, businesses }) {
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:28 }}>
         <div>
           <h1 style={S.h1}>Private Feedback</h1>
-          <p style={S.muted}>Unhappy customers captured privately — never posted to Google.</p>
+          <p style={S.muted}>Unhappy customers captured privately — kept private.</p>
         </div>
         <div style={{ display:"flex", gap:8 }}>
           {["all","unresolved","resolved"].map(f=>(
@@ -557,7 +813,7 @@ function Settings({ apiKey, setApiKey, businesses, setBusinesses }) {
         <div style={{ ...S.card, border:"1px solid #7c5cfc44", background:"#7c5cfc0a" }}>
           <h2 style={{ ...S.h2, fontSize:15 }}>🛡️ Review Gating</h2>
           <p style={{ ...S.muted, marginBottom:14, lineHeight:1.6 }}>
-            Review gating is <span style={{ color:"#4ade80", fontWeight:600 }}>enabled</span>. Customers who rate 1–3 stars see a private feedback form instead of Google.
+            Smart routing is enabled.
           </p>
           <div style={{ display:"flex", gap:12 }}>
             <div style={{ flex:1, background:"#12111a", borderRadius:8, padding:"12px 14px", textAlign:"center" }}>
