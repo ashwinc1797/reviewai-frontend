@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 
 // ── Gemini API helper ──────────────────────────────────────────────────────
 // Routes through your backend proxy (/api/gemini) to avoid browser CORS blocks.
@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 const API_BASE = "https://reviewai-backend-mqsr.onrender.com"; // empty = same domain as frontend; works after VPS deployment
 
 async function callGemini(apiKey, prompt) {
-  // 1. Try backend proxy (production — key stored server-side in .env)
+  // 1. Try backend proxy (production   key stored server-side in .env)
   try {
     const proxyRes = await fetch(API_BASE + "/api/gemini", {
       method: "POST",
@@ -20,10 +20,10 @@ async function callGemini(apiKey, prompt) {
       return data.text || "";
     }
   } catch (proxyErr) {
-    // Proxy not reachable — fall through to direct call below
+    // Proxy not reachable   fall through to direct call below
   }
 
-  // 2. Direct call fallback (local dev only — will fail in browser if CORS blocked)
+  // 2. Direct call fallback (local dev only   will fail in browser if CORS blocked)
   if (!apiKey) throw new Error("Proxy unreachable and no API key set. Add your Gemini key in Settings.");
   const res = await fetch(
     "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + apiKey,
@@ -77,7 +77,7 @@ const ISSUE_OPTIONS = ["Trainer quality", "Curriculum depth", "Batch timing", "P
 const Icon = {
   logo: () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-      {/* SpeedUp arrow — upward pointing arrow in a circle, matching brand */}
+      {/* SpeedUp arrow   upward pointing arrow in a circle, matching brand */}
       <circle cx="12" cy="12" r="10" fill="#CC0000"/>
       <polyline points="8,14 12,8 16,14" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
       <line x1="12" y1="8" x2="12" y2="17" stroke="#fff" strokeWidth="2.2" strokeLinecap="round"/>
@@ -375,7 +375,7 @@ function Divider({ style }) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-// CUSTOMER PAGE — redesigned, no gating language
+// CUSTOMER PAGE   redesigned, no gating language
 // ══════════════════════════════════════════════════════════════════════════
 function CustomerReviewPage({ biz, apiKey, onBack, onFeedbackSubmit, isPreview = false }) {
   const [step,       setStep]       = useState("rate");
@@ -423,7 +423,7 @@ SEO RULES (important):
 - Naturally include location "${biz.city}" or "Pune" in at least 1 of the 3 reviews
 - Include relevant keywords like: IT training, software course, web development, MERN stack, full stack developer, placement, job-ready, best institute
 - Use long-tail keywords naturally e.g. "best IT training institute in Pune", "software development course with placement"
-- Keywords must sound natural — never keyword-stuffed
+- Keywords must sound natural   never keyword-stuffed
 
 REVIEW RULES:
 - Be ${length} long
@@ -506,7 +506,7 @@ Return ONLY the JSON array, no other text.`;
              step==="done" && confirmed ? "Thank you!" :
              "How was your experience?"}
           </h1>
-          <p style={{ color:tokens.textSub, fontSize:14, margin:0 }}>{biz.name} · {biz.city} — IT Training</p>
+          <p style={{ color:tokens.textSub, fontSize:14, margin:0 }}>{biz.name} · {biz.city}   IT Training</p>
         </div>
 
         {/* Progress bar */}
@@ -589,7 +589,7 @@ Return ONLY the JSON array, no other text.`;
                     {copied ? "Review copied to clipboard" : "Copy your review text below"}
                   </p>
                   <p style={{ margin:"2px 0 0", fontSize:11, color:tokens.textSub }}>
-                    {copied ? "Ready to paste on Google" : "Clipboard access was blocked — copy manually"}
+                    {copied ? "Ready to paste on Google" : "Clipboard access was blocked   copy manually"}
                   </p>
                 </div>
               </div>
@@ -604,7 +604,7 @@ Return ONLY the JSON array, no other text.`;
               <div style={{ background:"rgba(245,158,11,0.08)", border:"1px solid rgba(245,158,11,0.2)", borderRadius:9, padding:"10px 14px", marginBottom:14, display:"flex", alignItems:"flex-start", gap:10 }}>
                 <span style={{ fontSize:16, flexShrink:0 }}>✏️</span>
                 <p style={{ margin:0, fontSize:12, color:tokens.amber, lineHeight:1.6 }}>
-                  <strong>Tip:</strong> Feel free to edit this in your own words on Google — 
+                  <strong>Tip:</strong> Feel free to edit this in your own words on Google   
                 </p>
               </div>
 
@@ -686,7 +686,7 @@ Return ONLY the JSON array, no other text.`;
           {/* PRIVATE FEEDBACK FORM */}
           {step==="feedback" && (
             <div>
-              {/* Warm heading — no mention of Google */}
+              {/* Warm heading   no mention of Google */}
               <div style={{ background:tokens.surfaceEl, border:`1px solid ${tokens.border}`, borderRadius:11, padding:"14px 16px", marginBottom:20, display:"flex", gap:12, alignItems:"flex-start" }}>
                 <div style={{ color:tokens.textSub, flexShrink:0, paddingTop:2 }}><Icon.heartHandshake /></div>
                 <div>
@@ -700,7 +700,7 @@ Return ONLY the JSON array, no other text.`;
               {/* Rating row */}
               <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:20, padding:"10px 14px", background:tokens.surfaceEl, borderRadius:9, border:`1px solid ${tokens.border}` }}>
                 <Stars rating={rating} size={14} />
-                <span style={{ fontSize:13, color:tokens.textSub }}>{rating} star{rating!==1?"s":""} — Experience rating</span>
+                <span style={{ fontSize:13, color:tokens.textSub }}>{rating} star{rating!==1?"s":""}   Experience rating</span>
                 <button style={{ marginLeft:"auto", background:"none", border:"none", color:tokens.accent, fontSize:12, cursor:"pointer", fontWeight:600 }} onClick={()=>setStep("rate")}>Change</button>
               </div>
 
@@ -728,7 +728,7 @@ Return ONLY the JSON array, no other text.`;
 
               {/* Contact */}
               <div style={{ marginBottom:22 }}>
-                <label style={S.label}>Your contact <span style={{ color:tokens.textMuted, fontWeight:400, textTransform:"none", letterSpacing:0 }}>(optional — we'll reach out to make it right)</span></label>
+                <label style={S.label}>Your contact <span style={{ color:tokens.textMuted, fontWeight:400, textTransform:"none", letterSpacing:0 }}>(optional   we'll reach out to make it right)</span></label>
                 <input style={S.input} placeholder="Phone or email" value={contact} onChange={e=>setContact(e.target.value)} />
               </div>
 
@@ -747,7 +747,7 @@ Return ONLY the JSON array, no other text.`;
               </div>
               <h2 style={{ ...S.h2, margin:"0 0 10px", fontSize:20 }}>We hear you.</h2>
               <p style={{ color:tokens.textSub, fontSize:14, lineHeight:1.65, marginBottom:20 }}>
-                Your feedback has been shared with the owner. We're committed to making things better — thank you for helping us improve.
+                Your feedback has been shared with the owner. We're committed to making things better   thank you for helping us improve.
               </p>
               {contact && (
                 <div style={{ background:tokens.greenLow, border:"1px solid rgba(34,197,94,0.25)", borderRadius:10, padding:"12px 16px", marginBottom:16, fontSize:13, color:tokens.green, display:"flex", alignItems:"center", gap:8 }}>
@@ -765,7 +765,7 @@ Return ONLY the JSON array, no other text.`;
           )}
         </div>
 
-        {/* Back link — only shown when previewing from dashboard, never for real customers */}
+        {/* Back link   only shown when previewing from dashboard, never for real customers */}
         {isPreview && (
           <div style={{ textAlign:"center", marginTop:18 }}>
             <button style={{ background:"none", border:"none", color:tokens.textMuted, fontSize:12, cursor:"pointer", display:"inline-flex", alignItems:"center", gap:5 }} onClick={onBack}>
@@ -1201,7 +1201,7 @@ function QRManager({ businesses }) {
       <div style={{ ...S.card, marginTop:20 }}>
         <h2 style={{ ...S.h2, fontSize:14, marginBottom:6 }}>Share Review Link</h2>
         <p style={{ ...S.muted, fontSize:12, marginBottom:16 }}>
-          Send this link to students via WhatsApp, SMS, or email — they don't need to scan a QR.
+          Send this link to students via WhatsApp, SMS, or email   they don't need to scan a QR.
         </p>
         <div style={{ background:tokens.surfaceEl, border:`1px solid ${tokens.border}`, borderRadius:9, padding:"11px 14px", marginBottom:14, display:"flex", alignItems:"center", gap:10 }}>
           <span style={{ fontSize:12, color:tokens.textSub, flex:1, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
@@ -1210,7 +1210,7 @@ function QRManager({ businesses }) {
           <ShareCopyButton url="https://reviewai-frontend-6fzg.onrender.com?review=1" />
         </div>
         <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
-          <a href={`https://wa.me/?text=${encodeURIComponent(`Hi! Thank you for choosing ${biz.name} 😊\nWe'd love your feedback — takes just 30 seconds:\nhttps://reviewai-frontend-6fzg.onrender.com?review=1`)}`}
+          <a href={`https://wa.me/?text=${encodeURIComponent(`Hi! Thank you for choosing ${biz.name} 😊\nWe'd love your feedback   takes just 30 seconds:\nhttps://reviewai-frontend-6fzg.onrender.com?review=1`)}`}
             target="_blank" rel="noopener noreferrer"
             style={{ ...S.btn("success"), textDecoration:"none" }}>
             <Icon.whatsapp /> Share on WhatsApp
@@ -1460,7 +1460,7 @@ function Settings({ apiKey, setApiKey, businesses, setBusinesses }) {
           setTestResult("error:Backend responded but Gemini key may be invalid");
         }
       } else {
-        setTestResult("error:Backend proxy not reachable — check Render deployment");
+        setTestResult("error:Backend proxy not reachable   check Render deployment");
       }
     } catch(e) {
       setTestResult("error:" + e.message);
@@ -1487,7 +1487,7 @@ function Settings({ apiKey, setApiKey, businesses, setBusinesses }) {
           </div>
           <div style={{ background:tokens.surfaceEl, borderRadius:10, padding:"12px 16px", marginBottom:14, fontSize:12, color:tokens.textSub, lineHeight:1.65 }}>
             <p style={{ margin:"0 0 4px", fontWeight:600, color:tokens.text }}>Your API key is stored securely on the server</p>
-            <p style={{ margin:0 }}>The Groq API key is configured in your Render backend environment — it never touches the browser. Click below to verify the connection is live.</p>
+            <p style={{ margin:0 }}>The Groq API key is configured in your Render backend environment   it never touches the browser. Click below to verify the connection is live.</p>
           </div>
           <button style={S.btn("primary")} onClick={testApi} disabled={testing}>
             {testing ? "Testing…" : "Test connection"}
@@ -1495,7 +1495,7 @@ function Settings({ apiKey, setApiKey, businesses, setBusinesses }) {
           {testResult && (
             <div style={{ marginTop:10, display:"flex", alignItems:"center", gap:8, fontSize:12, color:isConnected?tokens.green:tokens.red }}>
               {isConnected ? <Icon.check /> : <Icon.warning />}
-              {isConnected ? "Backend connected — AI features are working!" : testResult.replace("error:","Error: ")}
+              {isConnected ? "Backend connected   AI features are working!" : testResult.replace("error:","Error: ")}
             </div>
           )}
         </div>
