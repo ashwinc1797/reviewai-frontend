@@ -907,8 +907,8 @@ function QRManager({ businesses }) {
           document.body.appendChild(div);
           new window.QRCode(div, {
             text: activeUrl,
-            width: 300,
-            height: 300,
+            width: activeSize,
+            height: activeSize,
             colorDark: "#000000",
             colorLight: "#ffffff",
             correctLevel: window.QRCode.CorrectLevel?.H || 3,
@@ -947,7 +947,7 @@ function QRManager({ businesses }) {
     setTimeout(() => setCopied(false), 2000);
   }
 
-  const displaySize = 220;
+  const displaySize = Math.min(activeSize, 280);
 
   return (
     <div>
