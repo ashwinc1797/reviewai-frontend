@@ -604,7 +604,7 @@ Return ONLY the JSON array, no other text.`;
               <div style={{ background:"rgba(245,158,11,0.08)", border:"1px solid rgba(245,158,11,0.2)", borderRadius:9, padding:"10px 14px", marginBottom:14, display:"flex", alignItems:"flex-start", gap:10 }}>
                 <span style={{ fontSize:16, flexShrink:0 }}>✏️</span>
                 <p style={{ margin:0, fontSize:12, color:tokens.amber, lineHeight:1.6 }}>
-                  <strong>Tip:</strong> Feel free to edit this in your own words on Google — personalised reviews rank higher and carry more weight!
+                  <strong>Tip:</strong> Feel free to edit this in your own words on Google — 
                 </p>
               </div>
 
