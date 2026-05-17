@@ -377,7 +377,7 @@ function Divider({ style }) {
 // ══════════════════════════════════════════════════════════════════════════
 // CUSTOMER PAGE — redesigned, no gating language
 // ══════════════════════════════════════════════════════════════════════════
-function CustomerReviewPage({ biz, apiKey, onBack, onFeedbackSubmit }) {
+function CustomerReviewPage({ biz, apiKey, onBack, onFeedbackSubmit, isPreview = false }) {
   const [step,       setStep]       = useState("rate");
   const [rating,     setRating]     = useState(0);
   const [suggestions,setSuggestions]= useState([]);
@@ -749,12 +749,14 @@ Return ONLY the JSON array, no other text.`;
           )}
         </div>
 
-        {/* Back link */}
-        <div style={{ textAlign:"center", marginTop:18 }}>
-          <button style={{ background:"none", border:"none", color:tokens.textMuted, fontSize:12, cursor:"pointer", display:"inline-flex", alignItems:"center", gap:5 }} onClick={onBack}>
-            <Icon.arrowLeft /> Back to dashboard
-          </button>
-        </div>
+        {/* Back link — only shown when previewing from dashboard, never for real customers */}
+        {isPreview && (
+          <div style={{ textAlign:"center", marginTop:18 }}>
+            <button style={{ background:"none", border:"none", color:tokens.textMuted, fontSize:12, cursor:"pointer", display:"inline-flex", alignItems:"center", gap:5 }} onClick={onBack}>
+              <Icon.arrowLeft /> Back to dashboard
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -1483,10 +1485,12 @@ export default function App() {
   },[]);
 
   if (showCustomerPage) {
+    const isRealScan = new URLSearchParams(window.location.search).get("review") === "1" ||
+                       new URLSearchParams(window.location.search).get("r") === "1";
     return <CustomerReviewPage biz={businesses[0]} apiKey={apiKey}
+      isPreview={!isRealScan}
       onBack={()=>{
         setShowCustomerPage(false);
-        // Remove ?review param from URL when going back
         window.history.replaceState({}, "", window.location.pathname);
       }}
       onFeedbackSubmit={entry=>setFeedback(prev=>[entry,...prev])} />;
