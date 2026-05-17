@@ -397,12 +397,37 @@ function CustomerReviewPage({ biz, apiKey, onBack, onFeedbackSubmit }) {
     if (isHappy) {
       setLoading(true);
       try {
+        // Random elements to ensure unique reviews every time
+        const aspects = [
+          "trainers and faculty", "curriculum and syllabus", "placement support",
+          "hands-on projects", "learning environment", "batch timings",
+          "practical exposure", "doubt solving sessions", "industry relevance",
+          "lab infrastructure", "peer learning", "mentorship quality"
+        ];
+        const tones = ["enthusiastic", "genuine", "thoughtful", "casual", "professional", "grateful"];
+        const lengths = ["2 sentences", "3 sentences", "2-3 sentences"];
+
+        // Pick 3 random aspects, a random tone and length — different every call
+        const shuffle = arr => arr.sort(() => Math.random() - 0.5);
+        const pickedAspects = shuffle([...aspects]).slice(0, 6).join(", ");
+        const tone = tones[Math.floor(Math.random() * tones.length)];
+        const length = lengths[Math.floor(Math.random() * lengths.length)];
+        const seed = Math.random().toString(36).slice(2, 8); // random string
+
         const prompt = `You are a review writing assistant for an IT training institute called "${biz.name}" in ${biz.city}.
-The student wants to leave a ${rating}-star Google review about their training experience.
-Generate exactly 3 short, natural, authentic-sounding review suggestions (2-3 sentences each). 
-Mention aspects like trainers, curriculum, placement support, hands-on projects, or learning environment naturally.
-Format as JSON array: ["review1","review2","review3"]
-Only return the JSON array, nothing else.`;
+A student wants to leave a ${rating}-star Google review. Session ID: ${seed}
+
+Generate exactly 3 DIFFERENT, unique review suggestions. Each must:
+- Be ${length} long
+- Have a ${tone} tone  
+- Naturally mention DIFFERENT aspects from this list: ${pickedAspects}
+- Sound like it was written by a real student (not AI)
+- Be varied — no two reviews should start the same way or mention the same things
+- Avoid generic phrases like "highly recommend" in all 3
+
+Format as JSON array ONLY: ["review1","review2","review3"]
+Return ONLY the JSON array, no other text.`;
+
         const text = await callGemini(apiKey, prompt);
         const clean = text.replace(/```json|```/g,"").trim();
         setSuggestions(JSON.parse(clean));
