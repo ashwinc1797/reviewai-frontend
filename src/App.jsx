@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 // ── Gemini API helper ──────────────────────────────────────────────────────
 // Routes through your backend proxy (/api/gemini) to avoid browser CORS blocks.
@@ -7,7 +7,7 @@
 const API_BASE = "https://reviewai-backend-mqsr.onrender.com"; // empty = same domain as frontend; works after VPS deployment
 
 async function callGemini(apiKey, prompt) {
-  // 1. Try backend proxy (production   key stored server-side in .env)
+  // 1. Try backend proxy (production — key stored server-side in .env)
   try {
     const proxyRes = await fetch(API_BASE + "/api/gemini", {
       method: "POST",
@@ -20,10 +20,10 @@ async function callGemini(apiKey, prompt) {
       return data.text || "";
     }
   } catch (proxyErr) {
-    // Proxy not reachable   fall through to direct call below
+    // Proxy not reachable — fall through to direct call below
   }
 
-  // 2. Direct call fallback (local dev only   will fail in browser if CORS blocked)
+  // 2. Direct call fallback (local dev only — will fail in browser if CORS blocked)
   if (!apiKey) throw new Error("Proxy unreachable and no API key set. Add your Gemini key in Settings.");
   const res = await fetch(
     "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + apiKey,
@@ -50,7 +50,7 @@ const SEED_BUSINESSES = [{
   totalReviews: 127,
   scansToday: 0,
   scansWeek: 0,
-  whatsapp: "919876543210",
+  whatsapp: "919359459994",
 }];
 
 const SEED_REVIEWS = [
@@ -77,7 +77,7 @@ const ISSUE_OPTIONS = ["Trainer quality", "Curriculum depth", "Batch timing", "P
 const Icon = {
   logo: () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-      {/* SpeedUp arrow   upward pointing arrow in a circle, matching brand */}
+      {/* SpeedUp arrow — upward pointing arrow in a circle, matching brand */}
       <circle cx="12" cy="12" r="10" fill="#CC0000"/>
       <polyline points="8,14 12,8 16,14" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
       <line x1="12" y1="8" x2="12" y2="17" stroke="#fff" strokeWidth="2.2" strokeLinecap="round"/>
@@ -375,7 +375,7 @@ function Divider({ style }) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-// CUSTOMER PAGE   redesigned, no gating language
+// CUSTOMER PAGE — redesigned, no gating language
 // ══════════════════════════════════════════════════════════════════════════
 function CustomerReviewPage({ biz, apiKey, onBack, onFeedbackSubmit, isPreview = false }) {
   const [step,       setStep]       = useState("rate");
@@ -385,7 +385,7 @@ function CustomerReviewPage({ biz, apiKey, onBack, onFeedbackSubmit, isPreview =
   const [loading,    setLoading]    = useState(false);
   const [copied,     setCopied]     = useState(false);
   const [confirmed,  setConfirmed]  = useState(null);
-  const [issue,      setIssue]      = useState("");
+  const [issue,      setIssue]      = useState([]);
   const [details,    setDetails]    = useState("");
   const [contact,    setContact]    = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -459,7 +459,7 @@ Return ONLY the JSON array, no other text.`;
   function submitFeedback() {
     if (!issue) return;
     setSubmitting(true);
-    const entry = { id:`f${Date.now()}`, rating, issue, details, contact, date: new Date().toISOString().slice(0,10), resolved:false };
+    const entry = { id:`f${Date.now()}`, rating, issue: issue.join(", "), details, contact, date: new Date().toISOString().slice(0,10), resolved:false };
     onFeedbackSubmit?.(entry);
     setTimeout(() => { setSubmitting(false); setStep("feedbackDone"); }, 700);
   }
@@ -604,7 +604,7 @@ Return ONLY the JSON array, no other text.`;
               <div style={{ background:"rgba(245,158,11,0.08)", border:"1px solid rgba(245,158,11,0.2)", borderRadius:9, padding:"10px 14px", marginBottom:14, display:"flex", alignItems:"flex-start", gap:10 }}>
                 <span style={{ fontSize:16, flexShrink:0 }}>✏️</span>
                 <p style={{ margin:0, fontSize:12, color:tokens.amber, lineHeight:1.6 }}>
-                  <strong>Tip:</strong> Feel free to edit this in your own words on Google   
+                  <strong>Tip:</strong> Feel free to edit this in your own words on Google!
                 </p>
               </div>
 
@@ -686,7 +686,7 @@ Return ONLY the JSON array, no other text.`;
           {/* PRIVATE FEEDBACK FORM */}
           {step==="feedback" && (
             <div>
-              {/* Warm heading   no mention of Google */}
+              {/* Warm heading — no mention of Google */}
               <div style={{ background:tokens.surfaceEl, border:`1px solid ${tokens.border}`, borderRadius:11, padding:"14px 16px", marginBottom:20, display:"flex", gap:12, alignItems:"flex-start" }}>
                 <div style={{ color:tokens.textSub, flexShrink:0, paddingTop:2 }}><Icon.heartHandshake /></div>
                 <div>
@@ -707,16 +707,22 @@ Return ONLY the JSON array, no other text.`;
               {/* Issue chips */}
               <div style={{ marginBottom:18 }}>
                 <label style={S.label}>What could we improve? <span style={{ color:tokens.red }}>*</span></label>
+                <p style={{ fontSize:11, color:tokens.textMuted, marginBottom:8 }}>Select all that apply</p>
                 <div style={{ display:"flex", flexWrap:"wrap", gap:7 }}>
-                  {ISSUE_OPTIONS.map(opt=>(
-                    <button key={opt} onClick={()=>setIssue(opt)}
-                      style={{ padding:"7px 14px", borderRadius:20, fontSize:12, fontWeight:600, cursor:"pointer",
-                        border:`1px solid ${issue===opt?tokens.accent:tokens.border}`,
-                        background:issue===opt?tokens.accentLow:tokens.surfaceEl,
-                        color:issue===opt?tokens.accent:tokens.textSub, transition:"all 0.12s" }}>
-                      {opt}
-                    </button>
-                  ))}
+                  {ISSUE_OPTIONS.map(opt=>{
+                    const selected = issue.includes(opt);
+                    return (
+                      <button key={opt} onClick={()=>setIssue(prev => prev.includes(opt) ? prev.filter(i=>i!==opt) : [...prev, opt])}
+                        style={{ padding:"7px 14px", borderRadius:20, fontSize:12, fontWeight:600, cursor:"pointer",
+                          border:`1px solid ${selected?tokens.accent:tokens.border}`,
+                          background:selected?tokens.accentLow:tokens.surfaceEl,
+                          color:selected?tokens.accent:tokens.textSub, transition:"all 0.12s",
+                          display:"flex", alignItems:"center", gap:5 }}>
+                        {selected && <span style={{ fontSize:10 }}>✓</span>}
+                        {opt}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -732,8 +738,8 @@ Return ONLY the JSON array, no other text.`;
                 <input style={S.input} placeholder="Phone or email" value={contact} onChange={e=>setContact(e.target.value)} />
               </div>
 
-              <button style={{ ...S.btn("primary"), width:"100%", justifyContent:"center", padding:"13px", fontSize:14, opacity:issue?1:0.4 }}
-                onClick={submitFeedback} disabled={!issue||submitting}>
+              <button style={{ ...S.btn("primary"), width:"100%", justifyContent:"center", padding:"13px", fontSize:14, opacity:issue.length>0?1:0.4 }}
+                onClick={submitFeedback} disabled={issue.length===0||submitting}>
                 {submitting ? "Sending…" : <><Icon.send /> Send feedback</>}
               </button>
             </div>
@@ -755,7 +761,7 @@ Return ONLY the JSON array, no other text.`;
                 </div>
               )}
               {biz.whatsapp && (
-                <a href={`https://wa.me/${biz.whatsapp}?text=${encodeURIComponent(`Hi, I recently visited ${biz.name} and shared some feedback. I'd like to discuss my experience.`)}`}
+                <a href={`https://wa.me/919359459994?text=${encodeURIComponent(`Hi, I recently visited ${biz.name} and shared some feedback. I'd like to discuss my experience.`)}`}
                   target="_blank" rel="noopener noreferrer"
                   style={{ ...S.btn("success"), textDecoration:"none", justifyContent:"center", display:"inline-flex", gap:8 }}>
                   <Icon.whatsapp /> Chat on WhatsApp
@@ -765,7 +771,7 @@ Return ONLY the JSON array, no other text.`;
           )}
         </div>
 
-        {/* Back link   only shown when previewing from dashboard, never for real customers */}
+        {/* Back link — only shown when previewing from dashboard, never for real customers */}
         {isPreview && (
           <div style={{ textAlign:"center", marginTop:18 }}>
             <button style={{ background:"none", border:"none", color:tokens.textMuted, fontSize:12, cursor:"pointer", display:"inline-flex", alignItems:"center", gap:5 }} onClick={onBack}>
